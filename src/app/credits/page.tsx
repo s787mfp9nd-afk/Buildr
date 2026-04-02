@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import { useProjects } from "@/lib/hooks/useProjects";
 import { useCredits } from "@/lib/hooks/useCredits";
-import type { CreditWithSummary, CreditInsert, CreditReleaseInsert } from "@/lib/types/database";
+import type { CreditInsert, CreditReleaseInsert } from "@/lib/types/database";
+import type { CreditWithSummary } from "@/lib/hooks/useCredits";
 
 // ─── Formatting ───────────────────────────────────────────────────────────────
 
