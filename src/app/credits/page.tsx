@@ -599,13 +599,12 @@ export default function CreditsPage() {
     if (!activeProject) return;
     setFormLoading(true);
     await create({
-      project_id: activeProject.id,
       name: data.name.trim(),
       total_amount: parseFloat(data.total_amount),
       monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
       start_date: data.start_date || null,
       notes: data.notes.trim() || null,
-    } as Omit<CreditInsert, "user_id">);
+    });
     setFormLoading(false);
     setShowCreate(false);
   };
@@ -628,7 +627,7 @@ export default function CreditsPage() {
     creditId: string,
     data: Omit<CreditReleaseInsert, "credit_id">
   ) => {
-    await addRelease(creditId, data);
+    await addRelease({ ...data, credit_id: creditId });
   };
 
   const handleRemoveRelease = (releaseId: string) => {
