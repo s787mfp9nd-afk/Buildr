@@ -280,7 +280,7 @@ function ReleaseForm({
 }) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [label, setLabel] = useState("");
+  const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
 
   const canSubmit = parseFloat(amount) > 0;
@@ -288,7 +288,7 @@ function ReleaseForm({
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setLoading(true);
-    await onAdd({ amount: parseFloat(amount), release_date: date, label: label || null });
+    await onAdd({ amount: parseFloat(amount), release_date: date, note: note || null });
     setLoading(false);
     onClose();
   };
@@ -320,8 +320,8 @@ function ReleaseForm({
         />
       </div>
       <input
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
         placeholder="Libellé (optionnel)"
         className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
@@ -477,7 +477,7 @@ function CreditCard({
                     <tr key={r.id} className="border-b border-gray-50 last:border-0">
                       <td className="py-2 text-gray-600">{fmtDate(r.release_date)}</td>
                       <td className="py-2 text-gray-500 truncate max-w-[100px]">
-                        {r.label ?? <span className="text-gray-300">—</span>}
+                        {r.note ?? <span className="text-gray-300">—</span>}
                       </td>
                       <td className="py-2 text-right font-semibold text-gray-900">
                         {fmt(r.amount)}
