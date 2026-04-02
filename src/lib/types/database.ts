@@ -41,6 +41,8 @@ export interface Credit {
   interest_rate: number | null;
   duration_months: number | null;
   monthly_payment: number | null;
+  start_date: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -163,6 +165,8 @@ export interface CreditInsert {
   interest_rate?: number | null;
   duration_months?: number | null;
   monthly_payment?: number | null;
+  start_date?: string | null;
+  notes?: string | null;
 }
 
 export interface CreditReleaseInsert {
