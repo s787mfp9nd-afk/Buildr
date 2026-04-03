@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useProjects } from "@/lib/hooks/useProjects";
+import { createClient } from "@/lib/supabase/client";
 
 export default function NewProjectPage() {
   const router = useRouter();
-  const { create } = useProjects();
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -19,24 +19,49 @@ export default function NewProjectPage() {
   const set = (key: string, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const canSubmit = !!form.name.trim() && !!form.total_budget && !submitting;
+  const canSubmit = !!form.name.trim() && !submitting;
 
   async function handleSubmit() {
     if (!canSubmit) return;
     setSubmitting(true);
+    setError(null);
 
-    const project = await create({
-      name: form.name.trim(),
-      total_budget: parseFloat(form.total_budget),
-      start_date: form.start_date || null,
-      description: form.description.trim() || null,
-    });
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    setSubmitting(false);
-
-    if (project) {
-      router.push("/dashboard");
+    if (!user) {
+      setError("Non connecté. Veuillez vous reconnecter.");
+      setSubmitting(false);
+      return;
     }
+
+    const { data, error: sbError } = await supabase
+      .from("projects")
+      .insert({
+        name: form.name.trim(),
+        total_budget: parseFloat(form.total_budget) || 0,
+        start_date: form.start_date || null,
+        description: form.description.trim() || null,
+        user_id: user.id,
+      })
+      .select()
+      .single();
+
+    if (sbError || !data) {
+      setError(sbError?.message ?? "Erreur inconnue lors de la création.");
+      setSubmitting(false);
+      return;
+    }
+
+    // Sauvegarder comme projet actif
+    await supabase
+      .from("user_preferences")
+      .upsert(
+        { user_id: user.id, last_project_id: data.id },
+        { onConflict: "user_id" }
+      );
+
+    router.push("/dashboard");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -51,6 +76,15 @@ export default function NewProjectPage() {
       <h1 className="text-xl font-bold text-gray-900 mb-6">Nouveau projet</h1>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5" onKeyDown={handleKeyDown}>
+
+        {/* Message d'erreur */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p className="text-sm font-semibold text-red-700 mb-0.5">Erreur</p>
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Nom */}
         <div>
           <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
@@ -69,7 +103,7 @@ export default function NewProjectPage() {
         {/* Budget */}
         <div>
           <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-            Budget total (€) *
+            Budget total (€)
           </label>
           <input
             type="number"
