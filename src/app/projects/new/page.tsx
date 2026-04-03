@@ -61,7 +61,7 @@ export default function NewProjectPage() {
         { onConflict: "user_id" }
       );
 
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
