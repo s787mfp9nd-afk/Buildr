@@ -458,7 +458,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const activeNav = NAV_ITEMS.find(
     ({ href }) => pathname === href || pathname.startsWith(href + "/")
   );
-  const showNoProject = !loading && !activeProject;
+  const showNoProject = !loading && !activeProject && !pathname.startsWith("/projects");
 
   return (
     <div className="min-h-screen bg-gray-50">
