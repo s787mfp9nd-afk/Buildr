@@ -425,9 +425,9 @@ function CreditCard({
           </div>
         </div>
 
-        {/* Progress */}
+        {/* Progress déblocages */}
         <ProgressBar value={credit.total_released} max={credit.total_amount} color={barColor} />
-        <div className="flex justify-between mt-1">
+        <div className="flex justify-between mt-1 mb-2">
           <span className="text-[10px] text-gray-400">{Math.round(releasedPct)}% débloqué</span>
           {credit.monthly_payment && credit.monthly_payment > 0 && (
             <span className="text-[10px] text-gray-500 font-medium">
@@ -435,6 +435,21 @@ function CreditCard({
             </span>
           )}
         </div>
+
+        {/* Progress dépenses liées */}
+        {credit.total_expenses_linked > 0 && (
+          <>
+            <ProgressBar value={credit.total_expenses_linked} max={credit.total_amount} color="green" />
+            <div className="flex justify-between mt-1">
+              <span className="text-[10px] text-emerald-600 font-medium">
+                {fmt(credit.total_expenses_linked)} dépensé via ce crédit
+              </span>
+              <span className="text-[10px] text-gray-400">
+                {Math.round(Math.min(100, credit.total_expenses_linked / credit.total_amount * 100))}%
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Expand / collapse releases */}
